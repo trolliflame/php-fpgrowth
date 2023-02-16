@@ -82,7 +82,7 @@ class FPTree
      */
     protected function buildFPTree($transactions, $rootValue, $rootCount, &$frequent): FPNode
     {
-        $root = new FPNode($rootValue, $rootCount, null);
+        $root = new FPNode((int) $rootValue, $rootCount, null);
         arsort($frequent);
         foreach ($transactions as $transaction) {
             $sortedItems = [];
@@ -110,7 +110,7 @@ class FPTree
      */
     protected function insertTree(array $items, FPNode $node): void
     {
-        $first = $items[0];
+        $first = intval($items[0]);
         $child = $node->getChild($first);
 
         if ($child !== null) {
@@ -188,7 +188,7 @@ class FPTree
         // We are in a conditional tree.
         $newPatterns = [];
         foreach (array_keys($patterns) as $strKey) {
-            $key = explode(',', $strKey);
+            $key = explode(',', strval($strKey));
             $key[] = $this->root->value;
             sort($key);
             $newPatterns[implode(',', $key)] = $patterns[$strKey];
@@ -275,7 +275,7 @@ class FPTree
 
             // Insert subtree patterns into main patterns dictionary.
             foreach (array_keys($subtreePatterns) as $pattern) {
-                if (in_array($pattern, $patterns)) {
+                if (array_key_exists($pattern, $patterns)) {
                     $patterns[$pattern] += $subtreePatterns[$pattern];
                 } else {
                     $patterns[$pattern] = $subtreePatterns[$pattern];

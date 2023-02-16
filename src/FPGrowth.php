@@ -89,7 +89,7 @@ class FPGrowth
 
     /**
      * @param array $transactions
-     * @return array<string,int>
+     * @return array<int,int>
      */
     protected function findFrequentPatterns(array $transactions): array
     {
@@ -105,7 +105,8 @@ class FPGrowth
     {
         $rules = [];
         foreach (array_keys($patterns) as $pattern) {
-            $itemSet = explode(',', $pattern);
+            $itemSet = array_map('intval', explode(',', (string)$pattern));
+
             $upperSupport = $patterns[$pattern];
             for ($i = 1; $i < count($itemSet); $i++) {
                 $combinations = new Combinations($itemSet, $i);
@@ -117,9 +118,11 @@ class FPGrowth
                     $consequentStr = implode(',', $consequent);
                     if (isset($patterns[$antecedentStr])) {
                         $lowerSupport = $patterns[$antecedentStr];
-                        $confidence = floatval($upperSupport) / $lowerSupport;
-                        if ($confidence >= $this->confidence) {
-                            $rules[] = [$antecedentStr, $consequentStr, $confidence];
+                        if ($lowerSupport > 0) {
+                            $confidence = floatval($upperSupport) / $lowerSupport;
+                            if ($confidence >= $this->confidence) {
+                                $rules[] = [$antecedentStr, $consequentStr, $confidence];
+                            }
                         }
                     }
                 }
